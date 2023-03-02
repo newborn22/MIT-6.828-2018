@@ -11,6 +11,7 @@
 #include <kern/monitor.h>
 #include <kern/kdebug.h>
 
+
 #define CMDBUF_SIZE	80	// enough for one VGA text line
 
 
@@ -57,7 +58,30 @@ mon_kerninfo(int argc, char **argv, struct Trapframe *tf)
 int
 mon_backtrace(int argc, char **argv, struct Trapframe *tf)
 {
-	// Your code here.
+	cprintf("Stack backtrace:\n");
+	uint32_t args[5];
+	uint32_t ebp=read_ebp();
+	while(ebp!=0){
+	// get eip
+		uint32_t eip= *((int*)(ebp+4));
+	// get function name and file name
+		struct Eipdebuginfo info;
+		if(debuginfo_eip(eip,&info)){
+			cprintf("get debug info fail\n");
+		}
+			
+
+	// get arg
+		int i=0;
+		for(i=0;i<5;i++){
+			args[i]=*((int*)(ebp+8+i*4));
+		}	
+	// update ebp for loop
+		cprintf("ebp %08x eip %08x args %08x %08x %08x %08x %08x\n",ebp,eip,args[0],args[1],args[2],args[3],args[4]);
+		cprintf("\t%s:%d: %.*s+%d\n", info.eip_file, info.eip_line, info.eip_fn_namelen, info.eip_fn_name, eip-info.eip_fn_addr);
+		ebp = *((int*)ebp);
+
+	}
 	return 0;
 }
 
