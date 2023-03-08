@@ -167,25 +167,8 @@ mem_init(void)
 
 	pages=boot_alloc(npages*sizeof(struct PageInfo));
 	memset(pages,0,npages*sizeof(struct PageInfo));
-	/*
-	//将这块空间记录到页表中，记录的工作在下面做！
-	int i=0;
-	struct PageInfo* cur_page=pages;
-	for(i=0;i<npages;i++){
-		//接下去的空间中，根据memlayout,应该就到了ULIM，用户不能读写，即pages数组所在的空间只有内核能够访问
-		//检查是否要分配页表
-		if(!(kern_pgdir[PDX((uint32_t)cur_page)] & PTE_P)){
-			//分配页表，这也是多级页表省空间的原因，只有需要页表时才去分配
-			void* page_table=boot_alloc(PGSIZE);
-			kern_pgdir[PDX((uint32_t)cur_page)]=PADDR(page_table)|PTE_P;//不能设PTE_U
-		}
-		//将申请到的数组空间的物理地址写到页表项中，但是应该是用页表的虚拟地址去写
-		uint32_t pa_of_pt = PADDR(kern_pgdir[PDX(uint32_t)cur_page]);
-		uint32_t* va_of_pt = (uint32_t *)KADDR(pa_of_pt);
-		va_of_pt[PTX((uint32_t)cur_page)]=PADDR(cur_page)|PTE_P;
-		cur_page++;//
-	}
-	*/
+
+	
 
 
 	//////////////////////////////////////////////////////////////////////
